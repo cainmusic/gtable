@@ -1,21 +1,67 @@
 package main
 
 import (
+	"bufio"
+	"fmt"
+	"os"
+	"strconv"
+	"strings"
+
 	"github.com/cainmusic/gtable"
 )
 
-func main() {
-	normal()
-	writeFile()
-	readCsvFile()
-	readJsonString()
-	readJsonStringAndSetHead()
-	readCsvFileAndSetHead()
-	readDirTree()
-	formatTree()
+const outfile = "./out.txt"
+
+type funcEntry struct {
+	name string
+	f    func()
+	des  string
 }
 
-func normal() {
+func main() {
+	cases := []funcEntry{
+		funcEntry{name: "normal", f: normal, des: "basic use"},
+		funcEntry{name: "write file", f: writeFile, des: "write table into file"},
+		funcEntry{name: "read csv file", f: readCsvFile, des: "read csv file to make table"},
+		funcEntry{name: "read json string", f: readJsonString, des: "read json string to make table"},
+		funcEntry{name: "read json string and set head", f: readJsonStringAndSetHead, des: "read json string and set head to make table"},
+		funcEntry{name: "read csv file and set head", f: readCsvFileAndSetHead, des: "read csv file and set head to make table"},
+		funcEntry{name: "read dir tree", f: readDirTree, des: "read dir to format tree"},
+		funcEntry{name: "format tree", f: formatTree, des: "format tree"},
+		funcEntry{name: "align", f: align, des: "align blocks"},
+	}
+
+	reader := bufio.NewReader(os.Stdin)
+	table := gtable.NewTable()
+	for i, en := range cases {
+		table.AppendBody([]string{fmt.Sprint(i + 1), en.name, en.des})
+	}
+
+	for {
+		table.PrintData()
+		fmt.Println("type number to run func, or type quit to quit.")
+		text, err := reader.ReadString('\n')
+		if err != nil {
+			panic(err)
+		}
+		text = strings.TrimRight(text, "\r\n")
+		if text == "quit" {
+			return
+		}
+		idx, err := strconv.Atoi(text)
+		if err != nil {
+			fmt.Println("wrong input")
+			continue
+		}
+		if idx < 1 || idx > len(cases) {
+			fmt.Println("wrong input")
+			continue
+		}
+		cases[idx-1].f()
+	}
+}
+
+var normal = func() {
 	table := gtable.NewTable()
 
 	table.AppendTitle("this is a title")
@@ -26,7 +72,7 @@ func normal() {
 	table.PrintData()
 }
 
-func writeFile() {
+var writeFile = func() {
 	table := gtable.NewTable()
 
 	table.AppendTitle("this is a title")
@@ -38,12 +84,14 @@ func writeFile() {
 	table.AppendBody([]string{"4", "5", "6"})
 	table.AppendBody([]string{"7", "8", "9"})
 
-	table.SetOutputFile("./out.txt")
+	table.SetOutputFile(outfile)
 
 	table.PrintData()
+
+	fmt.Println("write data to file", outfile)
 }
 
-func readCsvFile() {
+var readCsvFile = func() {
 	table := gtable.NewTable()
 
 	table.InitInputFromFile("./test.csv", gtable.DataTypeCsv)
@@ -60,7 +108,7 @@ const s = `
 	{"No.": 5, "Name": "Ed", "Text": "Go fmt yourself!"}
 `
 
-func readJsonString() {
+var readJsonString = func() {
 	table := gtable.NewTable()
 
 	table.InitInputFromString(s, gtable.DataTypeJson)
@@ -69,7 +117,7 @@ func readJsonString() {
 	table.PrintData()
 }
 
-func readJsonStringAndSetHead() {
+var readJsonStringAndSetHead = func() {
 	table := gtable.NewTable()
 
 	table.InitInputFromString(s, gtable.DataTypeJson)
@@ -81,7 +129,7 @@ func readJsonStringAndSetHead() {
 	table.PrintData()
 }
 
-func readCsvFileAndSetHead() {
+var readCsvFileAndSetHead = func() {
 	table := gtable.NewTable()
 
 	table.InitInputFromFile("./test_no_head.csv", gtable.DataTypeCsv)
@@ -91,7 +139,7 @@ func readCsvFileAndSetHead() {
 	table.PrintData()
 }
 
-func readDirTree() {
+var readDirTree = func() {
 	table := gtable.NewTable()
 
 	table.ReadDirTree("..")
@@ -99,7 +147,7 @@ func readDirTree() {
 	table.PrintData()
 }
 
-func formatTree() {
+var formatTree = func() {
 	table := gtable.NewTable()
 
 	tls := []gtable.TreeLayer{
@@ -120,6 +168,25 @@ func formatTree() {
 	table.FormatTree(tls)
 
 	table.SetNoBorder()
+
+	table.PrintData()
+}
+
+var align = func() {
+	table := gtable.NewTable()
+
+	table.AppendTitle("this is a title")
+	table.AppendTitle("subtitle")
+	table.AppendHead([]string{"h1", "h2", "h3"})
+	table.AppendHead([]string{"h21", "h22", "h23"})
+	table.AppendBody([]string{"123456", "7890abc", "defghijklmnopqrstuvwxyz"})
+	table.AppendBody([]string{"1", "2", "3"})
+	table.AppendBody([]string{"4", "5", "6"})
+	table.AppendBody([]string{"7", "8", "9"})
+
+	table.SetAlignTitle(gtable.AlignCenter)
+	table.SetAlignHeadAll(gtable.AlignLeft)
+	table.SetAlignBodyAll(gtable.AlignRight)
 
 	table.PrintData()
 }

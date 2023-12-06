@@ -10,7 +10,7 @@ go tool to make table
 ## 一般用法
 
 ``` go
-func normal() {
+var normal = func() {
 	table := gtable.NewTable()
 
 	table.AppendTitle("this is a title")
@@ -22,9 +22,9 @@ func normal() {
 }
 ```
 
-```
 stdout
 
+```
 +--------------------------------------+
 |this is a title                       |
 +------+-------+-----------------------+
@@ -40,7 +40,7 @@ stdout
 ## 写文件
 
 ``` go
-func writeFile() {
+var writeFile = func() {
 	table := gtable.NewTable()
 
 	table.AppendTitle("this is a title")
@@ -52,15 +52,23 @@ func writeFile() {
 	table.AppendBody([]string{"4", "5", "6"})
 	table.AppendBody([]string{"7", "8", "9"})
 
-	table.SetOutputFile("./out.txt")
+	table.SetOutputFile(outfile)
 
 	table.PrintData()
+
+	fmt.Println("write data to file", outfile)
 }
 ```
 
+stdout
+
 ```
+write data to file ./out.txt
+```
+
 cat out.txt
 
+```
 +--------------------------------------+
 |this is a title                       |
 |subtitle                              |
@@ -78,7 +86,7 @@ cat out.txt
 ## 读csv文件
 
 ```go
-func readCsvFile() {
+var readCsvFile = func() {
 	table := gtable.NewTable()
 
 	table.InitInputFromFile("./test.csv", gtable.DataTypeCsv)
@@ -88,9 +96,9 @@ func readCsvFile() {
 }
 ```
 
-```
 stdout
 
+```
 +-------+-----+-----+-----+
 |type   |count|price|limit|
 +-------+-----+-----+-----+
@@ -118,7 +126,7 @@ const s = `
 	{"No.": 5, "Name": "Ed", "Text": "Go fmt yourself!"}
 `
 
-func readJsonString() {
+var readJsonString = func() {
 	table := gtable.NewTable()
 
 	table.InitInputFromString(s, gtable.DataTypeJson)
@@ -128,9 +136,9 @@ func readJsonString() {
 }
 ```
 
-```
 stdout
 
+```
 +---+----+----------------+
 |No.|Name|Text            |
 +---+----+----------------+
@@ -140,9 +148,11 @@ stdout
 |4  |Sam |Go fmt who?     |
 |5  |Ed  |Go fmt yourself!|
 +---+----+----------------+
+```
 
 也可能是
 
+```
 +----------------+---+----+
 |Text            |No.|Name|
 +----------------+---+----+
@@ -152,9 +162,11 @@ stdout
 |Go fmt who?     |4  |Sam |
 |Go fmt yourself!|5  |Ed  |
 +----------------+---+----+
+```
 
 也可能是
 
+```
 +----+----------------+---+
 |Name|Text            |No.|
 +----+----------------+---+
@@ -175,7 +187,7 @@ stdout
 为解决上面的问题我们可以提前设定head。(同时也可以设定title)
 
 ``` go
-func readJsonStringAndSetHead() {
+var readJsonStringAndSetHead = func() {
 	table := gtable.NewTable()
 
 	table.InitInputFromString(s, gtable.DataTypeJson)
@@ -188,9 +200,9 @@ func readJsonStringAndSetHead() {
 }
 ```
 
-```
 stdout
 
+```
 +-------------------------+
 |some dialog              |
 +---+----+----------------+
@@ -204,11 +216,11 @@ stdout
 +---+----+----------------+
 ```
 
-尝试把`table.SetHead([]string{"No.", "Name", "Text"})`改为`table.SetHead([]string{Name", "Text"})`，会得到：
+若尝试把`table.SetHead([]string{"No.", "Name", "Text"})`改为`table.SetHead([]string{Name", "Text"})`，会得到：
 
-```
 stdout
 
+```
 +---------------------+
 |some dialog          |
 +----+----------------+
@@ -225,7 +237,7 @@ stdout
 ### csv
 
 ``` go
-func readCsvFileAndSetHead() {
+var readCsvFileAndSetHead = func() {
 	table := gtable.NewTable()
 
 	table.InitInputFromFile("./test_no_head.csv", gtable.DataTypeCsv)
@@ -236,9 +248,9 @@ func readCsvFileAndSetHead() {
 }
 ```
 
-```
 stdout
 
+```
 +-------+-----+-----+-----+
 |type   |count|price|limit|
 +-------+-----+-----+-----+
@@ -253,7 +265,7 @@ stdout
 默认不读取`.`开头的目录和文件。
 
 ``` go
-func readDirTree() {
+var readDirTree = func() {
 	table := gtable.NewTable()
 
 	table.ReadDirTree("..")
@@ -262,9 +274,9 @@ func readDirTree() {
 }
 ```
 
-```
 stdout
 
+```
 +------------------------+
 |..                      |
 |+---README.md           |
@@ -283,10 +295,29 @@ stdout
 +------------------------+
 ```
 
+若给`readDirTree`也配置下一小节实现的不打印表格外边框`table.SetNoBorder()`，会得到：
+
+```
+..
++---README.md
++---go.mod
++---gtable.go
++---gtable_test.go
++---input
+|   +---readdir.go
++---input.go
++---output.go
++---test
+    +---main.go
+    +---out.txt
+    +---test.csv
+    +---test_no_head.csv
+```
+
 ## 构建树
 
 ``` go
-func formatTree() {
+var formatTree = func() {
 	table := gtable.NewTable()
 
 	tls := []gtable.TreeLayer{
@@ -314,9 +345,9 @@ func formatTree() {
 
 顺便实现了不打印表格外边框。
 
-```
 stdout
 
+```
 /
 +---hi
 +---hello
@@ -329,4 +360,46 @@ stdout
 |       +---moscow
 +---see
     +---k
+```
+
+## 对齐
+
+实现了左、中、右三个对齐模式。
+
+```
+var align = func() {
+	table := gtable.NewTable()
+
+	table.AppendTitle("this is a title")
+	table.AppendTitle("subtitle")
+	table.AppendHead([]string{"h1", "h2", "h3"})
+	table.AppendHead([]string{"h21", "h22", "h23"})
+	table.AppendBody([]string{"123456", "7890abc", "defghijklmnopqrstuvwxyz"})
+	table.AppendBody([]string{"1", "2", "3"})
+	table.AppendBody([]string{"4", "5", "6"})
+	table.AppendBody([]string{"7", "8", "9"})
+
+	table.SetAlignTitle(gtable.AlignCenter)
+	table.SetAlignHeadAll(gtable.AlignLeft)
+	table.SetAlignBodyAll(gtable.AlignRight)
+
+	table.PrintData()
+}
+```
+
+stdout
+
+```
++--------------------------------------+
+|           this is a title            |
+|               subtitle               |
++------+-------+-----------------------+
+|h1    |h2     |h3                     |
+|h21   |h22    |h23                    |
++------+-------+-----------------------+
+|123456|7890abc|defghijklmnopqrstuvwxyz|
+|     1|      2|                      3|
+|     4|      5|                      6|
+|     7|      8|                      9|
++------+-------+-----------------------+
 ```

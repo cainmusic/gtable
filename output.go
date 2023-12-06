@@ -91,12 +91,7 @@ func (t *table) PrintLine(line line) {
 }
 
 func (t *table) PrintTitle(title block) {
-	t.Print(title.raw)
-	tw := max(t.status.titleWidth, t.status.lineWidth)
-	if len(title.raw) < tw {
-		t.Print(string(bytes.Repeat(spaceByte, tw-len(title.raw))))
-	}
-
+	t.printBlock(title.raw, max(t.status.titleWidth, t.status.lineWidth), btTitle, 0)
 }
 
 func (t *table) PrintBlocks(blocks []block, bt blockType) {
@@ -105,11 +100,7 @@ func (t *table) PrintBlocks(blocks []block, bt blockType) {
 		if i < len(blocks) {
 			s = blocks[i].raw
 		}
-		t.Print(s)
-		wid := t.status.width[i]
-		if wid > len(s) {
-			t.Print(string(bytes.Repeat(spaceByte, wid-len(s))))
-		}
+		t.printBlock(s, t.status.width[i], bt, i)
 		if i < len(t.status.width)-1 {
 			t.Print(string(splitByte))
 		}
@@ -117,4 +108,35 @@ func (t *table) PrintBlocks(blocks []block, bt blockType) {
 	if t.status.titleWidth > t.status.lineWidth {
 		t.Print(string(bytes.Repeat(spaceByte, t.status.titleWidth-t.status.lineWidth)))
 	}
+}
+
+func (t *table) printBlock(s string, length int, bt blockType, idx int) {
+	at := t.getAlignType(bt, idx)
+	leftLen, rightLen := 0, 0
+	switch at {
+	case AlignLeft:
+		if length > len(s) {
+			rightLen = length - len(s)
+		}
+	case AlignRight:
+		if length > len(s) {
+			leftLen = length - len(s)
+		}
+	case AlignCenter:
+		if length > len(s) {
+			leftLen = (length - len(s)) / 2
+			rightLen = length - len(s) - leftLen
+		}
+	}
+	t.Print(string(bytes.Repeat(spaceByte, leftLen)))
+	t.Print(s)
+	t.Print(string(bytes.Repeat(spaceByte, rightLen)))
+}
+
+func (t *table) getAlignType(bt blockType, idx int) alignType {
+	align := t.config.align
+	if align[bt] != nil && len(align[bt]) > idx {
+		return align[bt][idx]
+	}
+	return AlignLeft
 }
