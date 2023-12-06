@@ -1,6 +1,12 @@
 # gtable
 go tool to make table
 
+## 注
+
+除特别说明外，文档所用函数都来自于文件`./test/main.go`，所用文件都在目录`./test/`，运行目录`./test/`。
+
+运行命令`go run main.go`，`go`版本高于等于`1.20`。
+
 ## 一般用法
 
 ``` go
@@ -29,7 +35,7 @@ stdout
 +------+-------+-----------------------+
 ```
 
-查看`./gtable_test.go`了解更多用法。
+查看`./gtable_test.go`了解更多一般用法。
 
 ## 写文件
 
@@ -198,7 +204,7 @@ stdout
 +---+----+----------------+
 ```
 
-尝试把`table.SetHead([]string{"No.", "Name", "Text"})`改为`table.SetHead([]string{Name", "Text"})`，会得到
+尝试把`table.SetHead([]string{"No.", "Name", "Text"})`改为`table.SetHead([]string{Name", "Text"})`，会得到：
 
 ```
 stdout
@@ -240,4 +246,39 @@ stdout
 |duck   |10   |20   |100  |
 |goose  |5    |30   |50   |
 +-------+-----+-----+-----+
+```
+
+## 读目录
+
+默认不读取`.`开头的目录和文件。
+
+``` go
+func readDirTree() {
+	table := gtable.NewTable()
+
+	table.ReadDirTree("..")
+
+	table.PrintData()
+}
+```
+
+```
+stdout
+
++------------------------+
+|..                      |
+|+---README.md           |
+|+---go.mod              |
+|+---gtable.go           |
+|+---gtable_test.go      |
+|+---input               |
+||   +---readdir.go      |
+|+---input.go            |
+|+---output.go           |
+|+---test                |
+|    +---main.go         |
+|    +---out.txt         |
+|    +---test.csv        |
+|    +---test_no_head.csv|
++------------------------+
 ```

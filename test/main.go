@@ -11,6 +11,7 @@ func main() {
 	readJsonString()
 	readJsonStringAndSetHead()
 	readCsvFileAndSetHead()
+	readDirTree()
 }
 
 func normal() {
@@ -85,6 +86,14 @@ func readCsvFileAndSetHead() {
 	table.InitInputFromFile("./test_no_head.csv", gtable.DataTypeCsv)
 	table.SetHead([]string{"type", "count", "price", "limit"})
 	table.ReadFromInput()
+
+	table.PrintData()
+}
+
+func readDirTree() {
+	table := gtable.NewTable()
+
+	table.ReadDirTree("..")
 
 	table.PrintData()
 }
