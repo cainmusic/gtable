@@ -282,3 +282,51 @@ stdout
 |    +---test_no_head.csv|
 +------------------------+
 ```
+
+## 构建树
+
+``` go
+func formatTree() {
+	table := gtable.NewTable()
+
+	tls := []gtable.TreeLayer{
+		gtable.TreeLayer{Layer: 0, Name: "/"},
+		gtable.TreeLayer{Layer: 1, Name: "hi"},
+		gtable.TreeLayer{Layer: 1, Name: "hello"},
+		gtable.TreeLayer{Layer: 2, Name: "world"},
+		gtable.TreeLayer{Layer: 2, Name: "china"},
+		gtable.TreeLayer{Layer: 3, Name: "shanghai"},
+		gtable.TreeLayer{Layer: 4, Name: "pudong"},
+		gtable.TreeLayer{Layer: 3, Name: "beijing"},
+		gtable.TreeLayer{Layer: 2, Name: "russia"},
+		gtable.TreeLayer{Layer: 3, Name: "moscow"},
+		gtable.TreeLayer{Layer: 1, Name: "see"},
+		gtable.TreeLayer{Layer: 2, Name: "k"},
+	}
+
+	table.FormatTree(tls)
+
+	table.SetNoBorder()
+
+	table.PrintData()
+}
+```
+
+顺便实现了不打印表格外边框。
+
+```
+stdout
+
+/
++---hi
++---hello
+|   +---world
+|   +---china
+|   |   +---shanghai
+|   |   |   +---pudong
+|   |   +---beijing
+|   +---russia
+|       +---moscow
++---see
+    +---k
+```

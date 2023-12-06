@@ -49,6 +49,9 @@ func (t *table) PrintData() {
 }
 
 func (t *table) PrintBorder(titleTop bool) {
+	if t.config.noBorder {
+		return
+	}
 	buffer := new(bytes.Buffer)
 	buffer.Write(turnByte)
 	if titleTop {
@@ -70,7 +73,9 @@ func (t *table) PrintBorder(titleTop bool) {
 }
 
 func (t *table) PrintLine(line line) {
-	t.Print(string(splitByte))
+	if !t.config.noBorder {
+		t.Print(string(splitByte))
+	}
 	switch line.bType {
 	case btTitle:
 		t.PrintTitle(line.blocks[0])
@@ -79,7 +84,10 @@ func (t *table) PrintLine(line line) {
 	case btBody:
 		t.PrintBlocks(line.blocks, btBody)
 	}
-	t.Println(string(splitByte))
+	if !t.config.noBorder {
+		t.Print(string(splitByte))
+	}
+	t.Println()
 }
 
 func (t *table) PrintTitle(title block) {

@@ -132,7 +132,23 @@ func (t *table) ClearDataAndReadFromInput() {
 
 func (t *table) ReadDirTree(pathToDir string) {
 	dir := input.NewDir(pathToDir)
+	//dir.ReadDot()
 	for _, str := range dir.ReadAndGet() {
+		t.AppendBody([]string{str})
+	}
+}
+
+type TreeLayer struct {
+	Layer int
+	Name  string
+}
+
+func (t *table) FormatTree(tls []TreeLayer) {
+	ens := input.NewEntries()
+	for i := 0; i < len(tls); i++ {
+		ens.Append(tls[i].Layer, tls[i].Name)
+	}
+	for _, str := range ens.FormatAndGet() {
 		t.AppendBody([]string{str})
 	}
 }

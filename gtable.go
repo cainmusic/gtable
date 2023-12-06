@@ -37,7 +37,9 @@ type status struct {
 	lineWidth  int
 }
 
-type config struct{}
+type config struct {
+	noBorder bool
+}
 
 type table struct {
 	data   []line
@@ -54,6 +56,10 @@ func NewTable() *table {
 		data:   []line{},
 		output: DefaultOutput,
 	}
+}
+
+func (t *table) SetNoBorder() {
+	t.config.noBorder = true
 }
 
 func (t *table) AppendTitle(s string) {
