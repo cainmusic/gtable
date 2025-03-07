@@ -7,6 +7,8 @@ import (
 	"io"
 	"os"
 	"strings"
+
+	"github.com/cainmusic/gtable/input"
 )
 
 type DataType uint8
@@ -126,4 +128,27 @@ func (t *table) ReadJsonReader() {
 func (t *table) ClearDataAndReadFromInput() {
 	t.ClearData()
 	t.ReadFromInput()
+}
+
+func (t *table) ReadDirTree(pathToDir string) {
+	dir := input.NewDir(pathToDir)
+	//dir.ReadDot()
+	for _, str := range dir.ReadAndGet() {
+		t.AppendBody([]string{str})
+	}
+}
+
+type TreeLayer struct {
+	Layer int
+	Name  string
+}
+
+func (t *table) FormatTree(tls []TreeLayer) {
+	ens := input.NewEntries()
+	for i := 0; i < len(tls); i++ {
+		ens.Append(tls[i].Layer, tls[i].Name)
+	}
+	for _, str := range ens.FormatAndGet() {
+		t.AppendBody([]string{str})
+	}
 }
