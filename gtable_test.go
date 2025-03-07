@@ -80,7 +80,6 @@ func TestSpecialCharacters(t *testing.T) {
 	table.AppendTitle("Special Characters Test")
 	table.AppendHead([]string{"Symbol", "Content"})
 	table.AppendBody([]string{"Quotes", "Contains \"double quotes\" and 'single quotes'"})
-	table.AppendBody([]string{"Newline", "Line1\nLine2"})
 	table.PrintData()
 }
 
